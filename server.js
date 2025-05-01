@@ -1,9 +1,11 @@
 const express = require("express");
 const OpenAI = require("openai");
+const cors = require("cors"); // 🔧 CORS-kirjasto lisätty
 require("dotenv").config();
 
 const app = express();
-app.use(express.json()); // Tämä riittää, ei tarvitse body-parseria
+app.use(cors()); // ✅ Salli pyynnöt selaimesta (HTML-testi)
+app.use(express.json()); // ✅ JSON-bodyjen käsittely
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
