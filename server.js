@@ -14,7 +14,7 @@ app.post("/kysy", async (req, res) => {
   const viesti = req.body.viesti;
   try {
     const vastaus = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: viesti }],
     });
     res.json({ vastaus: vastaus.choices[0].message.content });
