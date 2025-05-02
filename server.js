@@ -24,7 +24,7 @@ app.post("/kysy", async (req, res) => {
   const viesti = req.body.viesti;
 
   // 🧼 Tarkistus: onko viesti olemassa ja järkevässä pituudessa
-  if (!viesti || typeof viesti !== "string" || viesti.length < 5 || viesti.length > 300) {
+  if (!viesti || typeof viesti !== "string" || viesti.length < 2 || viesti.length > 300) {
     return res.status(400).json({ virhe: "Viestin pituus ei kelpaa." });
   }
 
