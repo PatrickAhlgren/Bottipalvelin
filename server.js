@@ -1,11 +1,20 @@
 const express = require("express");
 const OpenAI = require("openai");
-const cors = require("cors"); // 🔧 CORS-kirjasto lisätty
+const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
 const app = express();
-app.use(cors()); // ✅ Salli pyynnöt selaimesta (HTML-testi)
-app.use(express.json()); // ✅ JSON-bodyjen käsittely
+app.use(cors());
+app.use(express.json());
+
+// 🔐 Viestirajoitus: max 5 pyyntöä / minuutti / IP
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minuutti
+  max: 5,
+  message: { virhe: "Liikaa pyyntöjä. Yritä hetken kuluttua uudelleen." }
+});
+app.use("/kysy", limiter);
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,9 +23,9 @@ const openai = new OpenAI({
 app.post("/kysy", async (req, res) => {
   const viesti = req.body.viesti;
 
-  // Tarkistus: onko viesti olemassa ja tekstimuodossa?
-  if (!viesti || typeof viesti !== "string") {
-    return res.status(400).json({ virhe: "Viesti puuttuu tai ei ole tekstimuodossa." });
+  // 🧼 Tarkistus: onko viesti olemassa ja järkevässä pituudessa
+  if (!viesti || typeof viesti !== "string" || viesti.length < 5 || viesti.length > 300) {
+    return res.status(400).json({ virhe: "Viestin pituus ei kelpaa." });
   }
 
   try {
